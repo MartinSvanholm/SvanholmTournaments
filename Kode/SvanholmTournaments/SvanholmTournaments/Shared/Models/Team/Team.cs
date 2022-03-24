@@ -1,6 +1,7 @@
 ﻿using System;
-namespace SvanholmTournaments.Shared.Models.Team
-{
+
+namespace SvanholmTournaments.Shared.Models
+{ 
 	public class Team
 	{
 		public int Id { get; set; }

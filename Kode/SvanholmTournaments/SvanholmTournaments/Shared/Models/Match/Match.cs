@@ -1,6 +1,5 @@
 ﻿using System;
-using SvanholmTournaments.Shared.Models.Team;
-namespace SvanholmTournaments.Shared.Models.Match
+namespace SvanholmTournaments.Shared.Models
 {
     public class Match
     {
@@ -10,7 +9,9 @@ namespace SvanholmTournaments.Shared.Models.Match
 
         public string State { get; set; } = string.Empty;
 
-        public Team HomeTeam { get; set; }
+        public Team HomeTeam { get; set; } = new();
+
+        public Team AwayTeam { get; set; } = new();
 
         public Veto? Veto { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿using System;
-namespace SvanholmTournaments.Shared.Models.Team
-{
+namespace SvanholmTournaments.Shared.Models
+{ 
 	public class Player
 	{
         public Guid Id { get; set; }

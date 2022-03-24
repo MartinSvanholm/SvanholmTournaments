@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SvanholmTournaments.Shared.Models.Match
+namespace SvanholmTournaments.Shared.Models
 {
 	public class Bo1Veto : Veto
 	{

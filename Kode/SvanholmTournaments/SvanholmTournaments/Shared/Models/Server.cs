@@ -4,33 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SvanholmTournaments.Shared.Models
+namespace SvanholmTournaments.Shared.Models;
+
+public class Server
 {
-    public class Server
+    public string Id { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public int PlayersOnline { get; set; }
+
+    public string Ip { get; set; } = string.Empty;
+
+    public bool IsOn { get; set; }
+
+    public void StartServer()
     {
-        public string Id { get; set; } = string.Empty;
+        throw new NotImplementedException();
+    }
 
-        public string Name { get; set; } = string.Empty;
+    public void StopServer()
+    {
+        throw new NotImplementedException();
+    }
 
-        public int PlayersOnline { get; set; }
-
-        public string Ip { get; set; } = string.Empty;
-
-        public bool IsOn { get; set; }
-
-        public void StartServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void StopServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteServer()
-        {
-            throw new NotImplementedException();
-        }
+    public void DeleteServer()
+    {
+        throw new NotImplementedException();
     }
 }
