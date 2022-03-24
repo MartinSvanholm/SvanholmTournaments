@@ -9,4 +9,12 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Models\Match\" />
+    <None Remove="Models\Team\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Match\" />
+    <Folder Include="Models\Team\" />
+  </ItemGroup>
 </Project>
