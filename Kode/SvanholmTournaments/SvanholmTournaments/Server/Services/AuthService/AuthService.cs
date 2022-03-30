@@ -17,48 +17,78 @@ public class AuthService : IAuthService
     private readonly IRoleData _roleData;
     private readonly IUserRolesData _userRolesData;
 
-    public AuthService(IConfiguration configuration, IUserData userData, IRoleData roleData)
+    public AuthService(IConfiguration configuration, IUserData userData, IRoleData roleData, IUserRolesData userRolesData)
     {
         _configuration = configuration;
         _userData = userData;
         _roleData = roleData;
+        _userRolesData = userRolesData;
     }
 
     /// <summary>
-    /// Checks if the users username exists in the database.
+    /// Check if the user and role exists in the database, then insert the role for the user if they do.
     /// </summary>
     /// <param name="userDTO"></param>
-    /// <returns>Returns true if the users username exist in the database, otherwise false.</returns>
-    public async Task<bool> CheckIfUserExist(UserDTO userDTO)
+    /// <param name="roleName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public async Task AddRoleToUser(string userName, string roleName)
     {
-        IEnumerable<User> users = await _userData.GetUsers();
+        Role? role = await _roleData.GetRoleByName(roleName);
 
-        foreach (User user in users) {
+        if (role == null)
+            throw new ArgumentException("Role does not exist.");
 
-            if (user.Username == userDTO.Username)
-                return true;
-        }
+        User? user = await _userData.GetUserByUsername(userName);
 
-        return false;
+        if (user == null)
+            throw new ArgumentException("User does not exist.");
+
+        await _userRolesData.InsertRoleForUser(user, role.Id);
     }
 
-    /// <summary>
-    /// Checks if the role exists in the database.
-    /// </summary>
-    /// <param name="roleName"></param>
-    /// <returns>Returns true if the roles name exists in the database, otherwise false.</returns>
-    public async Task<bool> CheckIfRolesExists(List<string> roleNames)
+    public async Task RemoveRoleFromUser(string userName, string roleName)
     {
-        IEnumerable<Role> roles = await _roleData.GetRoles();
+        Role? role = await _roleData.GetRoleByName(roleName);
 
-        foreach (string roleName in roleNames) {
-            foreach (Role role in roles) {
-                if (role.Name == roleName)
-                    return true;
+        if (role == null)
+            throw new ArgumentException("Role does not exist.");
+
+        User? user = await _userData.GetUserByUsername(userName);
+
+        if (user == null)
+            throw new ArgumentException("User does not exist.");
+
+        await _userRolesData.DeleteRoleForUser(user, role.Id);
+    }
+
+    public async Task<AuthenticatedUserDTO?> Login(UserDTO userDTO)
+    {
+        User? user = await _userData.GetUserByUsername(userDTO.Username);
+
+        if (user == null)
+            return null;
+
+        if (!VerifyPasswordHash(userDTO, user))
+            return null;
+
+        List<Claim> claims = new()
+        {
+            new Claim(ClaimTypes.Name, user.Username)
+        };
+
+        if (user.Roles != null) {
+            foreach (Role role in user.Roles) {
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
             }
         }
 
-        return false;
+        AuthenticatedUserDTO authenticatedUserDTO = new AuthenticatedUserDTO {
+            Username = userDTO.Username,
+            AccessToken = CreateToken(claims)
+        };
+
+        return authenticatedUserDTO;
     }
 
     /// <summary>
@@ -104,7 +134,7 @@ public class AuthService : IAuthService
 
     public bool VerifyPasswordHash(UserDTO userDto, User user)
     {
-        using var hmac = new HMACSHA512(user.PasswordSalt);
+        using var hmac = new HMACSHA256(user.PasswordSalt);
 
         byte[] computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(userDto.Password));
         Console.WriteLine(computedHash == user.PasswordHash);
@@ -113,12 +143,6 @@ public class AuthService : IAuthService
 
     public string CreateToken(List<Claim> claims)
     {
-        //List<Claim> claims = new()
-        //{
-        //    new Claim(ClaimTypes.Name, user.Username),
-        //    new Claim(ClaimTypes.Role, "Admin")
-        //};
-
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
             _configuration.GetSection("AppSettings:Token").Value));
 
@@ -140,5 +164,42 @@ public class AuthService : IAuthService
 
         passwordSalt = hmac.Key;
         passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+    }
+
+    /// <summary>
+    /// Checks if the users username exists in the database.
+    /// </summary>
+    /// <param name="userDTO"></param>
+    /// <returns>Returns true if the users username exist in the database, otherwise false.</returns>
+    private async Task<bool> CheckIfUserExist(UserDTO userDTO)
+    {
+        IEnumerable<User> users = await _userData.GetUsers();
+
+        foreach (User user in users) {
+
+            if (user.Username == userDTO.Username)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the role exists in the database.
+    /// </summary>
+    /// <param name="roleName"></param>
+    /// <returns>Returns true if the roles name exists in the database, otherwise false.</returns>
+    private async Task<bool> CheckIfRolesExists(List<string> roleNames)
+    {
+        IEnumerable<Role> roles = await _roleData.GetRoles();
+
+        foreach (string roleName in roleNames) {
+            foreach (Role role in roles) {
+                if (role.RoleName == roleName)
+                    return true;
+            }
+        }
+
+        return false;
     }
 }

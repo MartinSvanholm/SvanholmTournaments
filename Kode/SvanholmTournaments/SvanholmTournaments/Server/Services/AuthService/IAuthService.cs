@@ -6,9 +6,10 @@ namespace SvanholmTournaments.Server.Services.AuthService;
 
 public interface IAuthService
 {
-    Task<bool> CheckIfRolesExists(List<string> roleNames);
-    Task<bool> CheckIfUserExist(UserDTO userDTO);
+    Task AddRoleToUser(string userName, string roleName);
     string CreateToken(List<Claim> claims);
+    Task<AuthenticatedUserDTO?> Login(UserDTO userDTO);
     Task RegisterUser(UserDTO userDto);
+    Task RemoveRoleFromUser(string userName, string roleName);
     bool VerifyPasswordHash(UserDTO userDto, User user);
 }

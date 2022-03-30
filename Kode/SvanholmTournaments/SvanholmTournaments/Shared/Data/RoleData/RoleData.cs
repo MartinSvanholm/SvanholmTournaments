@@ -26,5 +26,7 @@ public class RoleData : IRoleData
         return result.FirstOrDefault();
     }
 
-    public async Task InsertRole(Role role) => await _db.SaveData(storedProcedure: "dbo.spRole_Insert", new { role.Name });
+    public async Task<IEnumerable<Role>> GetRolesById(int roleId) => await _db.LoadData<Role, dynamic>(storedProcedure: "dbo.spRole_GetById", new { Id = roleId });
+
+    public async Task InsertRole(string roleName) => await _db.SaveData(storedProcedure: "dbo.spRole_Insert", new { RoleName = roleName });
 }

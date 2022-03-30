@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SvanholmTournaments.Server.Services.AuthService;
@@ -16,6 +17,26 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthenticatedUserDTO>> Login(UserDTO userDTO)
+    {
+        try {
+            AuthenticatedUserDTO? authenticatedUserDTO = await _authService.Login(userDTO);
+
+            if (authenticatedUserDTO == null)
+                return BadRequest("Wrong username or password.");
+
+            return Ok(authenticatedUserDTO);
+        }
+        catch (ArgumentException argumentExeption) {
+            return BadRequest(argumentExeption.Message);
+        }
+        catch (Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
+    [Authorize (Roles = "Admin")]
     [HttpPost("register")]
     public async Task<ActionResult> RegisterUser(UserDTO request)
     {
@@ -25,6 +46,40 @@ public class AuthController : ControllerBase
         }
         catch (ArgumentException argumentExeption) {
             return BadRequest(argumentExeption.Message);
+        }
+        catch (Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("addRole")] 
+    public async Task<ActionResult> AddRoleToUser(string userName, string roleName)
+    {
+        try {
+            await _authService.AddRoleToUser(userName, roleName);
+
+            return Ok($"Role: {roleName} added to user: {userName}");
+        }
+        catch (ArgumentException ex) {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("deleteRole")]
+    public async Task<ActionResult> DeleteRoleFromUser(string userName, string roleName)
+    {
+        try {
+            await _authService.RemoveRoleFromUser(userName, roleName);
+
+            return Ok($"Role deleted from user");
+        }
+        catch (ArgumentException ex) {
+            return BadRequest(ex.Message);
         }
         catch (Exception e) {
             return BadRequest($"Error: {e.Message}");

@@ -1,6 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spUserRoles_Get]
-	@UserId int,
-	@RoleId int
+	@UserId int
 AS
 BEGIN
 	SELECT RoleId
