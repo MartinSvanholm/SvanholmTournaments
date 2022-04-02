@@ -20,9 +20,9 @@ public class AuthenticationService : IAuthenticationService
         _localStorage = localStorage;
     }
 
-    public async Task<AuthenticatedUserDTO> Login(UserDTO userDto)
+    public async Task<AuthenticatedUserDTO> Login(loginDTO loginDTO)
     {
-        var authResult = await _client.PostAsJsonAsync("api/Auth/login", userDto);
+        var authResult = await _client.PostAsJsonAsync("api/Auth/login", loginDTO);
         var authContent = await authResult.Content.ReadAsStringAsync();
 
         if (authResult.IsSuccessStatusCode == false) {

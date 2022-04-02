@@ -1,21 +1,40 @@
-﻿@inherits LayoutComponentBase
+﻿@using SvanholmTournaments.Client.Pages.User
+@inherits LayoutComponentBase
 @inject NavigationManager navigationManager
+@inject IDialogService DialogService
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
 <MudLayout>
+
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">SvanholmTournaments</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" OnClick="NavigationToLogin"/>
-        <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Toggle Light/Dark Mode"/>
+        <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Inherit" Edge="Edge.End" OnClick="SettingsDrawerToggle"/>
     </MudAppBar>
+
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu/>
     </MudDrawer>
+
+    <MudDrawer @bind-Open="_settingsDrawerOpen" Width="350px" Anchor="Anchor.Right" Variant="@DrawerVariant.Temporary">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h5">User settings</MudText>
+        </MudDrawerHeader>
+        <MudDivider />
+        <UserSettings>
+
+        </UserSettings>
+        <MudDivider Class="my-4"/>
+
+        <MudContainer>
+            <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" T="bool" Label="Toggle Light/Dark Mode"/>
+        </MudContainer>
+    </MudDrawer>
+
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pl-10 pt-5">
             @Body
@@ -28,6 +47,8 @@
     private MudThemeProvider _mudThemeProvider;
 
     bool _drawerOpen = true;
+
+    bool _settingsDrawerOpen = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -43,8 +64,8 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    private void NavigationToLogin()
+    private void SettingsDrawerToggle()
     {
-        navigationManager.NavigateTo("/login");
+        _settingsDrawerOpen = !_settingsDrawerOpen;
     }
 }

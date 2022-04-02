@@ -1,0 +1,36 @@
+﻿@inject IDialogService DialogService
+@inject IAuthenticationService AuthService
+@inject ISnackbar Snackbar
+
+<MudContainer Class="mt-5 d-flex flex-column">
+    <AuthorizeView>
+        <Authorized>
+            <MudButton Variant="Variant.Filled" FullWidth="true" Color="Color.Error" OnClick="(async () => await Logout())">Logout</MudButton>
+        </Authorized>
+        <NotAuthorized>
+            <MudText Class="mx-auto mb-2" Typo="Typo.body1">You are not logged-in click here to login</MudText>
+            <MudButton Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" OnClick="OpenLoginDialog">Login</MudButton>
+        </NotAuthorized>
+</AuthorizeView>
+</MudContainer>
+
+@code {
+    private void OpenLoginDialog()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true, 
+                                                               MaxWidth = MaxWidth.Small, 
+                                                               FullWidth = true,
+                                                               Position = DialogPosition.TopCenter
+                                                              };
+
+        DialogService.Show<LoginDialog>("Login", closeOnEscapeKey);
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+
+        
+            Snackbar.Add("Logout successful", Severity.Success);
+    }
+}

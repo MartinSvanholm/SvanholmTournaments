@@ -1,0 +1,53 @@
+﻿@inject IAuthenticationService authService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavManager
+<MudDialog>
+    <DialogContent>
+
+        @if (showErrorMessage) {
+            <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>   
+        }
+
+        <MudForm Model="@loginDTO" @ref="@mudForm" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField @bind-Value="loginDTO.Username" For="@(() => loginDTO.Username)" Immediate="true" Label="Username"/>
+                    <MudTextField @bind-Value="loginDTO.Password" For="@(() => loginDTO.Password)" Immediate="true" Label="Password"/>
+            </MudCardContent>
+        </MudForm>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(async () => await login())">Login</MudButton>
+    </DialogActions>
+</MudDialog>
+
+    @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm mudForm;
+
+    loginDTO loginDTO = new();
+
+    string errorMessage = "";
+
+    bool showErrorMessage = false;
+
+    private async Task login()
+    {
+        try {
+            showErrorMessage = false;
+
+            await authService.Login(loginDTO);
+
+            Snackbar.Add("Login successful", Severity.Success);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        } catch (Exception e) {
+            errorMessage = e.Message;
+            showErrorMessage = true;
+        }
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

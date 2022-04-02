@@ -11,11 +11,11 @@ public class AuthStateProvider : AuthenticationStateProvider
     private readonly ILocalStorageService _localStorage;
     private readonly AuthenticationState _anonymous;
 
-    public AuthStateProvider(HttpClient httpClient, ILocalStorageService localStorage, AuthenticationState anonymous)
+    public AuthStateProvider(HttpClient httpClient, ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
         _localStorage = localStorage;
-        _anonymous = anonymous;
+        _anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new ClaimsIdentity())));
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

@@ -18,8 +18,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthenticatedUserDTO>> Login(UserDTO userDTO)
+    public async Task<ActionResult<AuthenticatedUserDTO>> Login(loginDTO loginDTO)
     {
+        UserDTO userDTO = new UserDTO() { Username = loginDTO.Username, Password = loginDTO.Password};
+
         try {
             AuthenticatedUserDTO? authenticatedUserDTO = await _authService.Login(userDTO);
 

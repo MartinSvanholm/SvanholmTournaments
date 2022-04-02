@@ -4,6 +4,6 @@ namespace SvanholmTournaments.Client.Services.AuthenticationServices;
 
 public interface IAuthenticationService
 {
-    Task<AuthenticatedUserDTO> Login(UserDTO userDto);
+    Task<AuthenticatedUserDTO> Login(loginDTO loginDTO);
     Task Logout();
 }
