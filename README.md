@@ -129,6 +129,11 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
+- [✓] Authentication
+    - [✓] AuthenticationDB
+    - [✓] Back-end authentication
+    - [✓] Front-end authentication
+
 - [ ] Admin Dashboard
     - [ ] Role creation
     - [ ] User registration
