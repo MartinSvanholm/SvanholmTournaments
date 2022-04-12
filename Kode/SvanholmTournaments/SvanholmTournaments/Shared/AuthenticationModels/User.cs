@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SvanholmTournaments.Shared.DTOs.AuthenticationDTOs;
 
 namespace SvanholmTournaments.Shared.AuthenticationModels;
 
@@ -16,7 +17,8 @@ public class User
     public byte[] PasswordHash { get; set; }
     public byte[] PasswordSalt { get; set; }
     public bool IsArchived { get; set; }
-    public List<Role> Roles { get; set; }
+    public List<Role> Roles { get; set; } = new();
+    public string Password { get; set; } = string.Empty;
 
     public User(string firstName, string lastName, string username, DateTime greatedDate, bool isArchived = false)
     {
@@ -30,5 +32,20 @@ public class User
     public User()
     {
 
+    }
+
+    public User MapUser(UserDTO userDTO)
+    {
+        FirstName = userDTO.FirstName;
+        LastName = userDTO.LastName;
+        Username = userDTO.Username;
+        Id = userDTO.Id;
+        CreatedDate = userDTO.CreatedDate;
+
+        foreach (var item in userDTO.Roles) {
+            Roles.Add(new Role(item));
+        }
+
+        return this;
     }
 }

@@ -11,7 +11,7 @@
         <MudForm Model="@loginDTO" @ref="@mudForm" ValidationDelay="0">
             <MudCardContent>
                 <MudTextField @bind-Value="loginDTO.Username" For="@(() => loginDTO.Username)" Immediate="true" Label="Username"/>
-                    <MudTextField @bind-Value="loginDTO.Password" For="@(() => loginDTO.Password)" Immediate="true" Label="Password"/>
+                <MudTextField @bind-Value="loginDTO.Password" For="@(() => loginDTO.Password)" Immediate="true" Label="Password"/>
             </MudCardContent>
         </MudForm>
     </DialogContent>

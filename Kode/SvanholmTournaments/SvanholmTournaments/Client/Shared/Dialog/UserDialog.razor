@@ -1,0 +1,71 @@
+﻿@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IUserService userService
+
+<MudDialog>
+    <DialogContent>
+        <UserForm @ref="@userForm" UserDTO="@UserDTO" ChangePassword="@ChangePassword"/>
+    </DialogContent>
+
+    <DialogActions>
+        @if(!ChangePassword) {
+            <MudButton Color="Color.Error" OnClick="@(async () => await Delete())">Delete</MudButton>
+        }
+        <MudSpacer />
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(async () => await Submit())">@SuccesBtnText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    UserForm userForm;
+
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public UserDTO? UserDTO { get; set; }
+
+    [Parameter]
+    public bool ChangePassword { get; set; } = false;
+
+    [Parameter]
+    public string SuccesBtnText { get; set; } = string.Empty;
+
+    User user = new();
+
+    void Cancel() => MudDialog.Cancel();
+
+    public async Task Submit()
+    {
+        try {
+            user = await userForm.Submit();
+
+            MudDialog.Close<User>(user);
+        }
+        catch (RequestErrorExeption e) {
+            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+        }
+    }
+
+    public async Task Delete()
+    {
+        
+        DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var result =  await DialogService.Show<DeleteDialog>("Delete user", options).Result;
+
+        if(!result.Cancelled) {
+            try {
+                await userService.DeleteUser(UserDTO);
+
+                Snackbar.Add("User deleted", Severity.Success);
+            }
+            catch (RequestErrorExeption e) {
+                Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            }
+
+            MudDialog.Close();
+        }
+    }
+}

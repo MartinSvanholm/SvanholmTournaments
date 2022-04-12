@@ -23,7 +23,22 @@ public class UserData : IUserData
         _roleData = roleData;
     }
 
-    public async Task<IEnumerable<User>> GetUsers() => await _db.LoadData<User, dynamic>(storedProcedure: "dbo.spUser_GetAll", new { });
+    public async Task<IEnumerable<User>> GetUsers()
+    {
+        IEnumerable<User> users = new List<User>();
+
+        users = await _db.LoadData<User, dynamic>(storedProcedure: "dbo.spUser_GetAll", new { });
+
+        foreach (User user in users) {
+            var roleIds = await _userRolesData.GetRolesForUser(user.Id);
+
+            foreach (var roleId in roleIds) {
+                user.Roles = (List<Role>) await _roleData.GetRolesById(roleId);
+            }
+        }
+
+        return users;
+    }
 
     public async Task<User?> GetUserByUsername(string username)
     {
@@ -54,7 +69,12 @@ public class UserData : IUserData
             user.PasswordSalt
         });
 
-    public async Task UpdateUser(User user) => await _db.SaveData(storedProcedure: "dbo.spUser_Update", user);
+    public async Task UpdateUser(User user)
+    {
+        Console.WriteLine($"{user.FirstName} {user.LastName} {user.Username} {user.Id}");
 
-    public async Task DeleteUser(int id) => await _db.SaveData(storedProcedure: "dbo.spUser_Acchive", new { Id = id });
+        await _db.SaveData(storedProcedure: "dbo.spUser_Update", new { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName });
+    }
+
+    public async Task DeleteUser(int id) => await _db.SaveData(storedProcedure: "dbo.spUser_Archive", new { Id = id });
 }

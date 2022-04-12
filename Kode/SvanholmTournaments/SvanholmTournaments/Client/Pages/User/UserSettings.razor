@@ -29,8 +29,7 @@
     private async Task Logout()
     {
         await AuthService.Logout();
-
-        
-            Snackbar.Add("Logout successful", Severity.Success);
+  
+        Snackbar.Add("Logout successful", Severity.Success);
     }
 }

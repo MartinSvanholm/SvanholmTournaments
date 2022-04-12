@@ -16,6 +16,8 @@ public class AuthStateProvider : AuthenticationStateProvider
         _httpClient = httpClient;
         _localStorage = localStorage;
         _anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(new ClaimsIdentity())));
+
+        GetAuthenticationStateAsync();
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

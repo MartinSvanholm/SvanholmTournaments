@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SvanholmTournaments.Server.Services.AuthService;
+using SvanholmTournaments.Shared.AuthenticationModels;
 using SvanholmTournaments.Shared.DTOs.AuthenticationDTOs;
 
 namespace SvanholmTournaments.Server.Controllers;
@@ -15,6 +16,18 @@ public class AuthController : ControllerBase
     public AuthController(IAuthService authService)
     {
         _authService = authService;
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("getallusers")]
+    public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+    {
+        try {
+            return Ok(await _authService.GetAllUsers());
+        }
+        catch (Exception e) {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost("login")]
@@ -54,8 +67,42 @@ public class AuthController : ControllerBase
         }
     }
 
+    [Authorize (Roles = "Admin")]
+    [HttpPut("update")]
+    public async Task<ActionResult<UserDTO>> UpdateUser(UserDTO userDTO)
+    {
+        try {
+            await _authService.UpdateUser(userDTO);
+
+            return Ok(userDTO);
+        }
+        catch (ArgumentException argumentExeption) {
+            return BadRequest(argumentExeption.Message);
+        }
+        catch(Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
     [Authorize(Roles = "Admin")]
-    [HttpPost("addRole")] 
+    [HttpPut ("delete")]
+    public async Task<ActionResult> DeleteUser(UserDTO userDTO)
+    {
+        try {
+            await _authService.DeleteUser(userDTO);
+
+            return Ok("User deleted");
+        }
+        catch (ArgumentException ex) {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("addRole")]
     public async Task<ActionResult> AddRoleToUser(string userName, string roleName)
     {
         try {

@@ -25,43 +25,6 @@ public class AuthService : IAuthService
         _userRolesData = userRolesData;
     }
 
-    /// <summary>
-    /// Check if the user and role exists in the database, then insert the role for the user if they do.
-    /// </summary>
-    /// <param name="userDTO"></param>
-    /// <param name="roleName"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public async Task AddRoleToUser(string userName, string roleName)
-    {
-        Role? role = await _roleData.GetRoleByName(roleName);
-
-        if (role == null)
-            throw new ArgumentException("Role does not exist.");
-
-        User? user = await _userData.GetUserByUsername(userName);
-
-        if (user == null)
-            throw new ArgumentException("User does not exist.");
-
-        await _userRolesData.InsertRoleForUser(user, role.Id);
-    }
-
-    public async Task RemoveRoleFromUser(string userName, string roleName)
-    {
-        Role? role = await _roleData.GetRoleByName(roleName);
-
-        if (role == null)
-            throw new ArgumentException("Role does not exist.");
-
-        User? user = await _userData.GetUserByUsername(userName);
-
-        if (user == null)
-            throw new ArgumentException("User does not exist.");
-
-        await _userRolesData.DeleteRoleForUser(user, role.Id);
-    }
-
     public async Task<AuthenticatedUserDTO?> Login(UserDTO userDTO)
     {
         User? user = await _userData.GetUserByUsername(userDTO.Username);
@@ -117,19 +80,91 @@ public class AuthService : IAuthService
             await _userData.InsertUser(user);
 
             foreach (string roleName in userDto.Roles) {
-                Role? role = await _roleData.GetRoleByName(roleName);
-
-                if (role != null) {
-                    await _userRolesData.InsertRoleForUser(user, role.Id);
-                }
-                else {
-                    throw new ArgumentException($"Role: {roleName} not found.");
-                }
+                await AddRoleToUser(user.Username, roleName);
             }
         }
         catch (Exception) {
             throw;
         }
+    }
+
+    /// <summary>
+    /// Updates the user on the database, returns the user if successful.
+    /// </summary>
+    /// <param name="userDTO"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async Task<UserDTO> UpdateUser(UserDTO userDTO)
+    {
+        if (! await CheckIfUserExist(userDTO)) {
+            throw new ArgumentException("The user does not exist.");
+        }
+
+        User updatedUser = new();
+        updatedUser.MapUser(userDTO);
+
+        await _userData.UpdateUser(updatedUser);
+
+        return userDTO;
+    }
+
+    public async Task DeleteUser(UserDTO userDTO)
+    {
+        if (await CheckIfUserExist(userDTO)) {
+            await _userData.DeleteUser(userDTO.Id);
+        } else {
+            throw new ArgumentException("The user does not exist.");
+        }
+    }
+
+    public async Task<IEnumerable<UserDTO>> GetAllUsers()
+    {
+        var users = await _userData.GetUsers();
+
+        List<UserDTO> userDTOs = new List<UserDTO>();
+
+        foreach (User user in users) {
+            userDTOs.Add(new UserDTO().MapUserDTO(user));
+        }
+
+        return userDTOs;
+    }
+
+    /// <summary>
+    /// Check if the user and role exists in the database, then insert the role for the user if they do.
+    /// </summary>
+    /// <param name="userDTO"></param>
+    /// <param name="roleName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public async Task AddRoleToUser(string userName, string roleName)
+    {
+        Role? role = await _roleData.GetRoleByName(roleName);
+
+        if (role == null)
+            throw new ArgumentException("Role does not exist.");
+
+        User? user = await _userData.GetUserByUsername(userName);
+
+        if (user == null)
+            throw new ArgumentException("User does not exist.");
+
+        await _userRolesData.InsertRoleForUser(user, role.Id);
+    }
+
+    public async Task RemoveRoleFromUser(string userName, string roleName)
+    {
+        Role? role = await _roleData.GetRoleByName(roleName);
+
+        if (role == null)
+            throw new ArgumentException("Role does not exist.");
+
+        User? user = await _userData.GetUserByUsername(userName);
+
+        if (user == null)
+            throw new ArgumentException("User does not exist.");
+
+        await _userRolesData.DeleteRoleForUser(user, role.Id);
     }
 
     public bool VerifyPasswordHash(UserDTO userDto, User user)

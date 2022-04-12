@@ -1,0 +1,89 @@
+﻿@page "/admin"
+@using SvanholmTournaments.Shared.Exeptions
+@inject HttpClient httpClient
+@inject IUserService userService
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@attribute [Authorize (Roles = "Admin")]
+
+<PageTitle>Admin Dashboard</PageTitle>
+
+<MudGrid>
+
+    <MudItem sm="12" md="6">
+        <MudPaper Class="pa-2" Elevation="4">
+            <UserTable Users="@users" _loading="@_loading" OnUserClickCallback="@OpenUpdateDialog" OnRegisterCallback="@OpenRegisterDialog"/>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem sm="12" md="6">
+        <MudPaper  Class="pa-2" Elevation="4">
+            <MudText Typo="@Typo.h4">Roles</MudText>
+        </MudPaper>
+    </MudItem>
+
+</MudGrid>
+
+
+
+@code {
+    private IEnumerable<User>? users = new List<User>();
+
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try {
+            users = await userService.GetUsers();
+            _loading = false;
+        } 
+        catch (RequestErrorExeption e) {
+            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            _loading = false;
+        }
+
+        if (users == null) {
+            Snackbar.Add("Could not find any users", Severity.Error);
+        } 
+    }
+
+    private async Task OpenUpdateDialog(User user)
+    {
+        UserDTO userDTO = new();
+        userDTO.MapUserDTO(user);
+
+        DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var parameters = new DialogParameters();
+        parameters.Add("UserDTO", userDTO);
+        parameters.Add("ChangePassword", false);
+        parameters.Add("SuccesBtnText", "Update");
+
+        var result = await DialogService.Show<UserDialog>($"Update: {user.Username}", parameters, options).Result;
+
+        if(!result.Cancelled) {
+            Snackbar.Add("User updated", Severity.Success);
+
+            try {
+                users = await userService.GetUsers();
+            } 
+            catch (RequestErrorExeption e) {
+                Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task OpenRegisterDialog()
+    {
+        UserDTO userDTO = new();
+
+        DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true};
+
+        var parameters = new DialogParameters();
+        parameters.Add("UserDTO", userDTO);
+        parameters.Add("ChangePassword", true);
+        parameters.Add("SuccesBtnText", "Create");
+
+        var result = await DialogService.Show<UserDialog>("Create new user", parameters, options).Result;
+    }
+}

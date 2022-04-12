@@ -7,6 +7,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using SvanholmTournaments.Client;
 using SvanholmTournaments.Client.Services.AuthenticationServices;
+using SvanholmTournaments.Client.Services.UserService;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,6 +15,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => InitializeClient());
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddMudServices(config => {

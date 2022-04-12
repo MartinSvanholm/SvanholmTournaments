@@ -1,11 +1,17 @@
 ﻿<MudNavMenu Bordered="true">
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Dashboard">Dashboard</MudNavLink>
-    <MudDivider />
-    <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.Add">Counter</MudNavLink>
-    <MudDivider />
-    <MudNavGroup Title="Settings" Icon="@Icons.Filled.Settings">
-        <MudDivider />
-        <MudNavLink Href="/fetchdata"  Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.Storage">FetchData</MudNavLink>
-    </MudNavGroup>
-    <MudDivider />
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Dashboard">Dashboard</MudNavLink>
+            <MudDivider />
+            <MudNavLink Href="/admin" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.AdminPanelSettings">Admin Dashboard</MudNavLink>
+
+        </Authorized>
+
+        <NotAuthorized>
+
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Dashboard">Dashboard</MudNavLink>
+
+        </NotAuthorized>
+    </AuthorizeView>
 </MudNavMenu>

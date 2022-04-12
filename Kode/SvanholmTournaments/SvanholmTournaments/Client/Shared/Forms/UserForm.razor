@@ -1,0 +1,65 @@
+﻿@using SvanholmTournaments.Shared.Exeptions
+@using System.Diagnostics.CodeAnalysis
+@inject IUserService userService
+
+<MudForm Model="@UserDTO" @ref="@mudForm">
+    <MudTextField @bind-Value="UserDTO.FirstName" Label="Firstname"/>
+    <MudTextField @bind-Value="UserDTO.LastName" Label="Lastname"/>
+    @if(ChangePassword) {
+        <MudTextField @bind-Value="UserDTO.Username" Label="Username"/>
+        <MudTextField @bind-Value="UserDTO.Password" Label="Password"/>
+    }
+</MudForm>
+
+@if(ChangePassword) {
+    <MudForm Model="@Role" @ref="roleForm">
+        <MudTextField @bind-Value="Role.RoleName" Label="Role"/>
+    </MudForm>
+}
+
+@code {
+    [Parameter, AllowNull]
+    public UserDTO UserDTO { get; set; }
+
+    [Parameter]
+    public bool ChangePassword { get; set; } = false;
+
+    public Role Role = new();
+
+    MudForm mudForm;
+
+    MudForm roleForm;
+
+    protected override void OnInitialized()
+    {
+        if (ChangePassword) {
+            UserDTO = new();
+            UserDTO.Roles = new();
+        }
+
+        base.OnInitialized();
+    }
+
+    public async Task<User> Submit()
+    {
+        if(ChangePassword) {
+            try {
+                if(Role.RoleName != null && Role.RoleName != string.Empty)
+                    UserDTO.Roles.Add(Role.RoleName);
+
+                return await userService.RegisterUser(UserDTO);
+            }
+            catch (RequestErrorExeption) {
+                throw;
+            }
+        } else {
+
+            try {
+                return await userService.UpdateUser(UserDTO);
+            }
+            catch (RequestErrorExeption) {
+                throw;
+            }   
+        }
+    }
+}

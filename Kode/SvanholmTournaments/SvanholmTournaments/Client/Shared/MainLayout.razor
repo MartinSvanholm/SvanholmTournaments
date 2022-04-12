@@ -9,7 +9,7 @@
 
 <MudLayout>
 
-    <MudAppBar Elevation="1">
+    <MudAppBar Elevation="1" Style="@($"background:{Colors.Purple.Darken3}")">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">SvanholmTournaments</MudText>
         <MudSpacer />
@@ -36,7 +36,7 @@
     </MudDrawer>
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pl-10 pt-5">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-6">
             @Body
         </MudContainer>
     </MudMainContent>
