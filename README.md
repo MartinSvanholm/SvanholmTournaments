@@ -135,8 +135,10 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [✓] Front-end authentication
 
 - [ ] Admin Dashboard
+    - [✓] User creation
+    - [✓] User update
+    - [✓] User delete
     - [ ] Role creation
-    - [ ] User registration
 
 - [ ] Server Dashboard
     - [ ] Dathost sync
