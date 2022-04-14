@@ -1,7 +1,10 @@
 ﻿@page "/admin"
+@using SvanholmTournaments.Client.Services.RoleService
 @using SvanholmTournaments.Shared.Exeptions
+@using SvanholmTournaments.Shared.AuthenticationModels
 @inject HttpClient httpClient
 @inject IUserService userService
+@inject IRoleService roleService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 @attribute [Authorize (Roles = "Admin")]
@@ -12,13 +15,28 @@
 
     <MudItem sm="12" md="6">
         <MudPaper Class="pa-2" Elevation="4">
-            <UserTable Users="@users" _loading="@_loading" OnUserClickCallback="@OpenUpdateDialog" OnRegisterCallback="@OpenRegisterDialog"/>
+            <UserTable Users="@users" _loading="@loadingUsers" OnUserClickCallback="@OpenUpdateDialog" OnRegisterCallback="@OpenRegisterDialog"/>
         </MudPaper>
     </MudItem>
 
     <MudItem sm="12" md="6">
         <MudPaper  Class="pa-2" Elevation="4">
-            <MudText Typo="@Typo.h4">Roles</MudText>
+
+            <MudTable Elevation="0" Items="@roles" Striped="true" Loading="@loadingRoles" LoadingProgressColor="Color.Info" T="Role">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h5">Roles</MudText>
+                    <MudSpacer />
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" Size="Size.Small" OnClick="@(async () => RegisterRoleAsync())">Create role</MudButton>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Rolename</MudTh>
+                    <MudTh>Id</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Rolename">@context.RoleName</MudTd>
+                    <MudTd DataLabel="Id">@context.Id</MudTd>
+                </RowTemplate>
+            </MudTable>
         </MudPaper>
     </MudItem>
 
@@ -28,21 +46,17 @@
 
 @code {
     private IEnumerable<User>? users = new List<User>();
+    private IEnumerable<Role>? roles;
 
-    private bool _loading = true;
+    private bool loadingUsers = true;
+    private bool loadingRoles = true;
 
     protected override async Task OnInitializedAsync()
     {
-        try {
-            users = await userService.GetUsers();
-            _loading = false;
-        } 
-        catch (RequestErrorExeption e) {
-            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
-            _loading = false;
-        }
+        await GetUsersAsync();
+        await GetRolesAsync();
 
-        if (users == null) {
+        if (roles == null) {
             Snackbar.Add("Could not find any users", Severity.Error);
         } 
     }
@@ -85,5 +99,50 @@
         parameters.Add("SuccesBtnText", "Create");
 
         var result = await DialogService.Show<UserDialog>("Create new user", parameters, options).Result;
+    }
+
+    private async Task GetUsersAsync()
+    {
+        try {
+            users = await userService.GetUsers();
+            loadingUsers = false;
+        } 
+        catch (RequestErrorExeption e) {
+            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            loadingUsers = false;
+        }
+
+        if (users == null) {
+            Snackbar.Add("Could not find any users", Severity.Error);
+        } 
+    }
+
+    private async Task GetRolesAsync()
+    {
+        try {
+            roles = await roleService.GetRolesAsync();
+            loadingRoles = false;
+        } 
+        catch (RequestErrorExeption e) {
+            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            loadingRoles = false;
+        }
+    }
+
+    private async Task RegisterRoleAsync()
+    {
+        DialogOptions options = new DialogOptions() { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true};
+
+        var result = await DialogService.Show<RoleDialog>("Create new user", options).Result;
+
+        if(!result.Cancelled) {
+            try {
+                roles = await roleService.GetRolesAsync();
+                StateHasChanged();
+            }
+            catch (RequestErrorExeption e) {
+                Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            }
+        }
     }
 }

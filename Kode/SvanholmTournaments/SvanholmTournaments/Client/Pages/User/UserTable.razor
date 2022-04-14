@@ -3,31 +3,28 @@
 @using SvanholmTournaments.Shared.Exeptions
 @using System.Diagnostics.CodeAnalysis
 
-<MudTable Elevation="0" Items="@Users" Dense="true" Loading="@_loading" Hover="true" Striped="true" @bind-SelectedItem="@selectedUser" Filter="new Func<User,bool>(FilterFunc1)" OnRowClick="RowClickEvent" T="User">
+<MudTable Elevation="0" Items="@Users" Loading="@_loading" Hover="true" Striped="true" @bind-SelectedItem="@selectedUser" Filter="new Func<User,bool>(FilterFunc1)" OnRowClick="RowClickEvent" T="User">
     <ToolBarContent>
         <MudText Typo="Typo.h5">Users</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudButton Class="ml-10" Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" Size="Size.Small" OnClick="Register">Create user</MudButton>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Firstname</MudTh>
         <MudTh>Lastname</MudTh>
         <MudTh>Username</MudTh>
         <MudTh>Created date</MudTh>
+        <MudTh>Id</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd Class="cursor-pointer" DataLabel="Firstname">@context.FirstName</MudTd>
         <MudTd Class="cursor-pointer" DataLabel="Lastname">@context.LastName</MudTd>
         <MudTd Class="cursor-pointer" DataLabel="Username">@context.Username</MudTd>
         <MudTd Class="cursor-pointer" DataLabel="Created date">@context.CreatedDate</MudTd>
+        <MudTd Class="cursor-pointer" DataLabel="Id">@context.Id</MudTd>
     </RowTemplate>
     <PagerContent>
-
-        <MudContainer Class="d-flex justify-space-between flex-row-reverse">
-            <MudTablePager />
-            <MudPaper Elevation="0" Class="d-flex flex-column justify-center">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" Size="Size.Small" OnClick="Register">Create user</MudButton>
-            </MudPaper>
+        <MudContainer Class="pa-0">
         </MudContainer>
         
     </PagerContent>

@@ -1,0 +1,40 @@
+﻿@using SvanholmTournaments.Client.Services.RoleService
+@inject IRoleService roleService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@role" @ref="@mudForm">
+            <MudTextField @bind-Value="role.RoleName" Label="Rolename" Required="false" RequiredError="User name is required!"/>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(async () => await Submit())">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+
+    MudForm mudForm;
+
+    private Role role { get; set; } = new Role();
+
+    async Task Submit() 
+    {
+        try {
+            await roleService.CreateRoleAsync(role);
+            Snackbar.Add("Role created", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(true));
+        } 
+        catch (RequestErrorExeption e) {
+            Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);
+            Cancel();
+        }
+
+        
+    }
+    void Cancel() => MudDialog.Cancel();
+}

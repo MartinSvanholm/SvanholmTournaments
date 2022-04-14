@@ -1,0 +1,24 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@typeparam TItem
+
+<MudTable Items="@Items" Hover="true" Loading="@loading" LoadingProgressColor="Color.Info" T="TItem">
+    <HeaderContent>
+        <MudTr>@TableHeader</MudTr>
+    </HeaderContent>
+    <RowTemplate>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter, AllowNull]
+    public RenderFragment TableHeader { get; set; }
+
+    [Parameter, AllowNull]
+    public RenderFragment Template { get; set; }
+
+    [Parameter, AllowNull]
+    public IEnumerable<TItem> Items { get; set; }
+
+    [Parameter]
+    public bool loading { get; set; }
+}

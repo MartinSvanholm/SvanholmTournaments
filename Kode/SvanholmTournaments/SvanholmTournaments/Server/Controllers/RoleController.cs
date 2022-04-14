@@ -17,12 +17,25 @@ public class RoleController : ControllerBase
         _roleData = roleData;
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPost("create")]
-    public async Task<ActionResult> CreateRole(string roleName)
+    [Authorize (Roles = "Admin")]
+    [HttpGet ("getall")]
+    public async Task<ActionResult<IEnumerable<Role>>> GetAllRoles ()
     {
         try {
-            await _roleData.InsertRole(roleName);
+            IEnumerable<Role> roles = await _roleData.GetRoles();
+            return Ok(roles);
+        }
+        catch (Exception e) {
+            return BadRequest($"Error: {e.Message}");
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("create")]
+    public async Task<ActionResult> CreateRole(Role role)
+    {
+        try {
+            await _roleData.InsertRole(role.RoleName);
             return Ok("Role created.");
         }
         catch (Exception e) {

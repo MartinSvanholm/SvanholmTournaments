@@ -28,5 +28,13 @@ public class RoleData : IRoleData
 
     public async Task<IEnumerable<Role>> GetRolesById(int roleId) => await _db.LoadData<Role, dynamic>(storedProcedure: "dbo.spRole_GetById", new { Id = roleId });
 
-    public async Task InsertRole(string roleName) => await _db.SaveData(storedProcedure: "dbo.spRole_Insert", new { RoleName = roleName });
+    public async Task InsertRole(string roleName)
+    {
+        try {
+            await _db.SaveData(storedProcedure: "dbo.spRole_Insert", new { RoleName = roleName });
+        }
+        catch (Exception e) {
+            Console.WriteLine(e.Message);
+        }
+    }
 }
