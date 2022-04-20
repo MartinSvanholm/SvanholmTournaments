@@ -26,7 +26,11 @@ public class RoleData : IRoleData
         return result.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<Role>> GetRolesById(int roleId) => await _db.LoadData<Role, dynamic>(storedProcedure: "dbo.spRole_GetById", new { Id = roleId });
+    public async Task<Role?> GetRoleById(int roleId)
+    {
+        var result = await _db.LoadData<Role, dynamic>(storedProcedure: "dbo.spRole_GetById", new { Id = roleId });
+        return result.FirstOrDefault();
+    }
 
     public async Task InsertRole(string roleName)
     {

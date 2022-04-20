@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using SvanholmTournaments.Shared;
 using SvanholmTournaments.Shared.AuthenticationModels;
 using SvanholmTournaments.Shared.Data;
 using SvanholmTournaments.Shared.Data.RoleData;
@@ -103,7 +104,21 @@ public class AuthService : IAuthService
         User updatedUser = new();
         updatedUser.MapUser(userDTO);
 
+        Printer.PrintUser(updatedUser);
+
         await _userData.UpdateUser(updatedUser);
+        await _userRolesData.DeleteRolesForUser(updatedUser);
+
+        foreach (Role role in updatedUser.Roles) {
+            Role? tempRole = await _roleData.GetRoleByName(role.RoleName);
+
+            if (tempRole == null) {
+                throw new ArgumentException($"Role: {role.RoleName} does not exist");
+            }
+            else {
+                await _userRolesData.InsertRoleForUser(updatedUser, tempRole.Id);
+            }
+        }
 
         return userDTO;
     }
@@ -164,7 +179,7 @@ public class AuthService : IAuthService
         if (user == null)
             throw new ArgumentException("User does not exist.");
 
-        await _userRolesData.DeleteRoleForUser(user, role.Id);
+        await _userRolesData.DeleteRolesForUser(user);
     }
 
     public bool VerifyPasswordHash(UserDTO userDto, User user)
@@ -172,7 +187,6 @@ public class AuthService : IAuthService
         using var hmac = new HMACSHA256(user.PasswordSalt);
 
         byte[] computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(userDto.Password));
-        Console.WriteLine(computedHash == user.PasswordHash);
         return computedHash.SequenceEqual(user.PasswordHash);
     }
 
@@ -185,7 +199,7 @@ public class AuthService : IAuthService
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddMinutes(30),
+            expires: DateTime.Now.AddMinutes(120),
             signingCredentials: cred);
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);

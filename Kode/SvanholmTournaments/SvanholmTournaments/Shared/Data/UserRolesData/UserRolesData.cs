@@ -17,9 +17,13 @@ public class UserRolesData : IUserRolesData
         _db = db;
     }
 
-    public async Task<IEnumerable<int>> GetRolesForUser(int userId) => await _db.LoadData<int, dynamic>(storedProcedure: "dbo.spUserRoles_Get", new { UserId = userId });
+    public async Task<IEnumerable<int>> GetRolesForUser(int userId)
+    {
+        var result = await _db.LoadData<int, dynamic>(storedProcedure: "dbo.spUserRoles_Get", new { UserId = userId });
+        return result;
+    }
 
     public async Task InsertRoleForUser(User user, int roleId) => await _db.SaveData(storedProcedure: "dbo.spUserRoles_Insert", new { UserId = user.Id, RoleId = roleId });
 
-    public async Task DeleteRoleForUser(User user, int roleId) => await _db.SaveData(storedProcedure: "dbo.spUserRoles_Delete", new { UserId = user.Id, RoleId = roleId });
+    public async Task DeleteRolesForUser(User user) => await _db.SaveData(storedProcedure: "dbo.spUserRoles_DeleteRolesForUser", new { UserId = user.Id });
 }

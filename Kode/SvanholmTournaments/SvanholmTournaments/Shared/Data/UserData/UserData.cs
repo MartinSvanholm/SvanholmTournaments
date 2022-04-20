@@ -33,7 +33,7 @@ public class UserData : IUserData
             var roleIds = await _userRolesData.GetRolesForUser(user.Id);
 
             foreach (var roleId in roleIds) {
-                user.Roles = (List<Role>) await _roleData.GetRolesById(roleId);
+                user.Roles.Add(await _roleData.GetRoleById(roleId));
             }
         }
 
@@ -52,7 +52,7 @@ public class UserData : IUserData
         var roleIds = await _userRolesData.GetRolesForUser(user.Id);
 
         foreach (var roleId in roleIds) {
-            user.Roles = (List<Role>) await _roleData.GetRolesById(roleId);
+            user.Roles.Add(await _roleData.GetRoleById(roleId));
         }
 
         return user;
@@ -71,9 +71,9 @@ public class UserData : IUserData
 
     public async Task UpdateUser(User user)
     {
-        Console.WriteLine($"{user.FirstName} {user.LastName} {user.Username} {user.Id}");
-
         await _db.SaveData(storedProcedure: "dbo.spUser_Update", new { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName });
+
+
     }
 
     public async Task DeleteUser(int id) => await _db.SaveData(storedProcedure: "dbo.spUser_Archive", new { Id = id });

@@ -6,6 +6,6 @@ public interface IRoleData
 {
     Task<Role?> GetRoleByName(string roleName);
     Task<IEnumerable<Role>> GetRoles();
-    Task<IEnumerable<Role>> GetRolesById(int roleId);
+    Task<Role?> GetRoleById(int roleId);
     Task InsertRole(string roleName);
 }

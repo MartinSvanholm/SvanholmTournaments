@@ -1,6 +1,8 @@
 ﻿@using SvanholmTournaments.Shared.Exeptions
 @using System.Diagnostics.CodeAnalysis
 @inject IUserService userService
+@inject ILocalStorageService localStorage
+@inject ISnackbar SnackBar
 
 <MudForm Model="@UserDTO" @ref="@mudForm">
     <MudTextField @bind-Value="UserDTO.FirstName" Label="Firstname"/>
@@ -11,11 +13,31 @@
     }
 </MudForm>
 
-@if(ChangePassword) {
-    <MudForm Model="@Role" @ref="roleForm">
-        <MudTextField @bind-Value="Role.RoleName" Label="Role"/>
-    </MudForm>
-}
+<MudContainer Class="ma-0 pa-0 mt-8">
+    <MudContainer Class="ma-0 pa-0 d-flex">
+        <MudText Typo="Typo.h6">Roles</MudText>
+        <MudSpacer />
+        <MudMenu Label="Add role" Variant="Variant.Filled" Color="Color.Primary">
+            @foreach (Role role in AllRoles)
+            {
+                <MudMenuItem OnClick="() => AddRole(role.RoleName)">@role.RoleName</MudMenuItem>
+            }
+        </MudMenu>
+    </MudContainer>
+
+    <MudTable Class="mt-2" Items="@UserDTO.Roles" Dense="true" Striped="true">
+        <ColGroup>
+            <col style="width: 100%"/>
+            <col />
+        </ColGroup>
+        <HeaderContent>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Role">@context</MudTd>
+            <MudTd><MudIconButton OnClick="@(() => RemoveRole(context))" DisableElevation="true" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Variant="Variant.Text" Size="Size.Small"></MudIconButton></MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
 
 @code {
     [Parameter, AllowNull]
@@ -24,18 +46,20 @@
     [Parameter]
     public bool ChangePassword { get; set; } = false;
 
-    public Role Role = new();
+    private IEnumerable<Role> AllRoles { get; set; } = new List<Role>();
 
     MudForm mudForm;
 
     MudForm roleForm;
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         if (ChangePassword) {
             UserDTO = new();
             UserDTO.Roles = new();
         }
+
+        AllRoles = await localStorage.GetItemAsync<IEnumerable<Role>>("roles");
 
         base.OnInitialized();
     }
@@ -44,8 +68,8 @@
     {
         if(ChangePassword) {
             try {
-                if(Role.RoleName != null && Role.RoleName != string.Empty)
-                    UserDTO.Roles.Add(Role.RoleName);
+                //if(Role.RoleName != null && Role.RoleName != string.E)
+                //UserDTO.Roles.Add(Role.RoleName);
 
                 return await userService.RegisterUser(UserDTO);
             }
@@ -61,5 +85,25 @@
                 throw;
             }   
         }
+    }
+
+    private void AddRole(string roleName)
+    {
+        foreach (string userRoleName in UserDTO.Roles)
+        {
+            if(roleName == userRoleName) {
+                SnackBar.Add("User already have that role", Severity.Error);
+                return;
+            } 
+        }
+
+        UserDTO.Roles.Add(roleName);
+        StateHasChanged();    
+    }
+
+    private void RemoveRole(string roleName)
+    {
+        UserDTO.Roles.Remove(roleName);
+        StateHasChanged();
     }
 }

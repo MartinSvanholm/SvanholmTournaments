@@ -1,12 +1,10 @@
 ﻿@page "/admin"
-@using SvanholmTournaments.Client.Services.RoleService
-@using SvanholmTournaments.Shared.Exeptions
-@using SvanholmTournaments.Shared.AuthenticationModels
 @inject HttpClient httpClient
 @inject IUserService userService
 @inject IRoleService roleService
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
+@inject ILocalStorageService localStorage
 @attribute [Authorize (Roles = "Admin")]
 
 <PageTitle>Admin Dashboard</PageTitle>
@@ -122,6 +120,8 @@
         try {
             roles = await roleService.GetRolesAsync();
             loadingRoles = false;
+
+            await localStorage.SetItemAsync("roles", roles);
         } 
         catch (RequestErrorExeption e) {
             Snackbar.Add($"Error {e.StatusCode}: {e.Message}", Severity.Error);

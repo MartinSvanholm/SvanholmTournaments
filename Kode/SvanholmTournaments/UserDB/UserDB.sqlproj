@@ -76,7 +76,7 @@
     <Build Include="dbo\StoredProcedures\Roles\spRole_Insert.sql" />
     <Build Include="dbo\Tables\UserRoles.sql" />
     <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_Insert.sql" />
-    <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_Delete.sql" />
+    <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_DeleteRolesforUser.sql" />
     <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_Get.sql" />
     <Build Include="dbo\StoredProcedures\Roles\spRole_GetById.sql" />
   </ItemGroup>
