@@ -27,4 +27,13 @@ public class SqlDataAccess : ISqlDataAccess
 
         await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
     }
+
+    public async Task<IEnumerable<TRETURN>> MultiMapLoad<TFIRST, TSECOND, TRETURN>(string storedProcedure, Func<TFIRST, TSECOND, TRETURN> func, string connectionId = "UserDB")
+    {
+        using IDbConnection connection = new SqlConnection(_config.GetConnectionString(connectionId));
+
+        var test = connection.Query<TFIRST, TSECOND, TRETURN>(storedProcedure, map: func, commandType: CommandType.StoredProcedure);
+
+        return test;
+    }
 }

@@ -11,33 +11,38 @@
 
 <MudGrid>
 
-    <MudItem sm="12" md="6">
-        <MudPaper Class="pa-2" Elevation="4">
-            <UserTable Users="@users" _loading="@loadingUsers" OnUserClickCallback="@OpenUpdateDialog" OnRegisterCallback="@OpenRegisterDialog"/>
-        </MudPaper>
-    </MudItem>
+    @if (users != null)
+    {
+        <MudItem sm="12" md="6">
+            <MudPaper Class="pa-2" Elevation="4">
+                <UserTable Users="@users" _loading="@loadingUsers" OnUserClickCallback="@OpenUpdateDialog" OnRegisterCallback="@OpenRegisterDialog"/>
+            </MudPaper>
+        </MudItem>
+    }
 
-    <MudItem sm="12" md="6">
-        <MudPaper  Class="pa-2" Elevation="4">
+    @if (roles != null)
+    {
+        <MudItem sm="12" md="6">
+            <MudPaper  Class="pa-2" Elevation="4">
 
-            <MudTable Elevation="0" Items="@roles" Striped="true" Loading="@loadingRoles" LoadingProgressColor="Color.Info" T="Role">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h5">Roles</MudText>
-                    <MudSpacer />
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" Size="Size.Small" OnClick="@(async () => RegisterRoleAsync())">Create role</MudButton>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Rolename</MudTh>
-                    <MudTh>Id</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Rolename">@context.RoleName</MudTd>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
-                </RowTemplate>
-            </MudTable>
-        </MudPaper>
-    </MudItem>
-
+                <MudTable Elevation="0" Items="@roles" Striped="true" Loading="@loadingRoles" LoadingProgressColor="Color.Info" T="Role">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h5">Roles</MudText>
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" Size="Size.Small" OnClick="@(async () => RegisterRoleAsync())">Create role</MudButton>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Rolename</MudTh>
+                        <MudTh>Id</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Rolename">@context.RoleName</MudTd>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+    }
 </MudGrid>
 
 

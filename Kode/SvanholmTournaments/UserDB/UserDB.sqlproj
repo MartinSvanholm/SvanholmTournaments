@@ -62,6 +62,7 @@
     <Folder Include="dbo\StoredProcedures\User" />
     <Folder Include="dbo\StoredProcedures\Roles" />
     <Folder Include="dbo\StoredProcedures\UserRoles" />
+    <Folder Include="dbo\StoredProcedures\DatHostAccounts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Users.sql" />
@@ -79,6 +80,9 @@
     <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_DeleteRolesforUser.sql" />
     <Build Include="dbo\StoredProcedures\UserRoles\spUserRoles_Get.sql" />
     <Build Include="dbo\StoredProcedures\Roles\spRole_GetById.sql" />
+    <Build Include="dbo\Tables\DatHostAccounts.sql" />
+    <Build Include="dbo\StoredProcedures\DatHostAccounts\spDHAccount_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\DatHostAccounts\spDHAccount_Insert.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UserDB.publish.xml" />

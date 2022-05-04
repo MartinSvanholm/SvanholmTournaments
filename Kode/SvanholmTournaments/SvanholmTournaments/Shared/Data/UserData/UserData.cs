@@ -27,7 +27,7 @@ public class UserData : IUserData
     {
         IEnumerable<User> users = new List<User>();
 
-        users = await _db.LoadData<User, dynamic>(storedProcedure: "dbo.spUser_GetAll", new { });
+        users = await _db.MultiMapLoad<User, DatHostAccount, User>(storedProcedure: "dbo.spUser_GetAll", (user, datHostAccount) => { user.DatHostAccount = datHostAccount; return user; });
 
         foreach (User user in users) {
             var roleIds = await _userRolesData.GetRolesForUser(user.Id);

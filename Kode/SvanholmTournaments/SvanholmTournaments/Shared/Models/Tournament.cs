@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SvanholmTournaments.Shared.Models.Server;
 
 namespace SvanholmTournaments.Shared.Models
 {
@@ -14,7 +15,7 @@ namespace SvanholmTournaments.Shared.Models
 
         public List<Team> Teams = new();
 
-        public List<Server> Servers = new();
+        public List<ICsgoServer> Servers = new();
 
         public void CreateBrackets()
         {

@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using SvanholmTournaments.Shared.DTOs.AuthenticationDTOs;
 using SvanholmTournaments.Shared.Exeptions;
@@ -12,12 +13,14 @@ public class AuthenticationService : IAuthenticationService
     private readonly HttpClient _client;
     private readonly AuthenticationStateProvider _authStateProvider;
     private readonly ILocalStorageService _localStorage;
+    private readonly NavigationManager NavManager;
 
-    public AuthenticationService(HttpClient client, AuthenticationStateProvider authStateProvider, ILocalStorageService localStorage)
+    public AuthenticationService(HttpClient client, AuthenticationStateProvider authStateProvider, ILocalStorageService localStorage, NavigationManager navManager)
     {
         _client = client;
         _authStateProvider = authStateProvider;
         _localStorage = localStorage;
+        NavManager = navManager;
     }
 
     public async Task<AuthenticatedUserDTO> Login(loginDTO loginDTO)

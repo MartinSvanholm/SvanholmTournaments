@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SvanholmTournaments.Shared.Models;
 
-public class Server
+public class CsgoServer
 {
     public string Id { get; set; } = string.Empty;
 
